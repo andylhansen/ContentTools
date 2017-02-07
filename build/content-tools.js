@@ -8112,7 +8112,7 @@
       return new ContentEdit.Text('p', {}, '');
     };
 
-    _EditorApp.prototype.init = function(queryOrDOMElements, namingProp, fixtureTest, withIgnition) {
+    _EditorApp.prototype.init = function(queryOrDOMElements, namingProp, fixtureTest, withIgnition, extra) {
       if (namingProp == null) {
         namingProp = 'id';
       }
@@ -8122,7 +8122,11 @@
       if (withIgnition == null) {
         withIgnition = true;
       }
+      if (extra == null) {
+        extra = {};
+      }
       this._namingProp = namingProp;
+      this._extra = extra;
       if (fixtureTest) {
         this._fixtureTest = fixtureTest;
       }
@@ -8162,7 +8166,7 @@
           };
         })(this));
       }
-      this._toolbox = new ContentTools.ToolboxUI(ContentTools.DEFAULT_TOOLS);
+      this._toolbox = new ContentTools.ToolboxUI(this._extra.tools || ContentTools.DEFAULT_TOOLS);
       this.attach(this._toolbox);
       this._inspector = new ContentTools.InspectorUI();
       this.attach(this._inspector);
@@ -8600,7 +8604,9 @@
           }
         };
       })(this);
-      window.addEventListener('beforeunload', this._handleBeforeUnload);
+      if (!this._extra.ignoreUnload) {
+        window.addEventListener('beforeunload', this._handleBeforeUnload);
+      }
       this._handleUnload = (function(_this) {
         return function(ev) {
           return _this.destroy();

@@ -125,13 +125,17 @@ class _EditorApp extends ContentTools.ComponentUI
             queryOrDOMElements,
             namingProp='id',
             fixtureTest=null,
-            withIgnition=true
+            withIgnition=true,
+            extra={}
             ) ->
 
         # Initialize the editor application
 
         # Set the naming property
         @_namingProp = namingProp
+
+        # Store extra options
+        @_extra = extra
 
         # If defined set the function used to test for fixtures
         if fixtureTest
@@ -182,7 +186,7 @@ class _EditorApp extends ContentTools.ComponentUI
                     @_ignition.state('ready')
 
         # Toolbox
-        @_toolbox = new ContentTools.ToolboxUI(ContentTools.DEFAULT_TOOLS)
+        @_toolbox = new ContentTools.ToolboxUI(@_extra.tools || ContentTools.DEFAULT_TOOLS)
         @attach(@_toolbox)
 
         # Inspector
@@ -741,8 +745,8 @@ class _EditorApp extends ContentTools.ComponentUI
                 cancelMessage = ContentEdit._(ContentTools.CANCEL_MESSAGE)
                 (ev or window.event).returnValue = cancelMessage
                 return cancelMessage
-
-        window.addEventListener('beforeunload', @_handleBeforeUnload)
+        if not @_extra.ignoreUnload
+            window.addEventListener('beforeunload', @_handleBeforeUnload)
 
         # When the page is unloaded we destroy the app to make sure everything
         # is cleaned up.
